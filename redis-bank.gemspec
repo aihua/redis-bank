@@ -10,9 +10,8 @@ Gem::Specification.new do |s|
     init.rb
     lib/redis-bank.rb
   )
-  s.add_runtime_dependency 'money'
-  s.add_runtime_dependency 'activesupport'
-  s.add_development_dependency 'money'
+  s.add_runtime_dependency 'money', '~> 6.0'
+  s.add_runtime_dependency 'activesupport', '~> 4.0'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'simplecov'

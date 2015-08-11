@@ -114,6 +114,10 @@ describe Money::Bank::RedisBank do
       subject.get_rate('USD', 'EUR').should == 1.25
     end
 
+    it "returns nil when rate is undefined" do
+      subject.get_rate('USD', 'EUR').should be_nil
+    end
+
     context "has same currency for source and destination" do
       it "returns 1" do
         subject.get_rate('AUD', 'AUD').should == 1
@@ -130,6 +134,21 @@ describe Money::Bank::RedisBank do
 
     it "raises an UnknownCurrency exception when an unknown currency is passed" do
       expect { subject.get_rate('AAA', 'BBB') }.to raise_exception(Money::Currency::UnknownCurrency)
+    end
+  end
+
+  describe "#each_rate" do
+    before do
+      subject.set_rate('USD', 'EUR', 1.25)
+      subject.set_rate('AUD', 'BTC', 4.00)
+    end
+
+    it "iterates through each defined exchange rate" do
+      expect { |b| subject.each_rate(&b) }
+        .to yield_successive_args(
+              ['USD', 'EUR', 1.25],
+              ['AUD', 'BTC', 4.00]
+            )
     end
   end
 

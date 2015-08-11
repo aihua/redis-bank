@@ -1,4 +1,5 @@
-require 'money/bank/base'
+require 'money'
+require 'active_support'
 require 'active_support/core_ext'
 
 class Money
@@ -198,6 +199,29 @@ class Money
       #   rate_key_for("USD", "CAD") #=> "usd_to_cad"
       def rate_key_for(from, to)
         "#{Currency.wrap(from).iso_code}_to_#{Currency.wrap(to).iso_code}".downcase
+      end
+
+      # Iterate over rate tuples (iso_from, iso_to, rate)
+      #
+      # @yieldparam iso_from [String] Currency ISO string.
+      # @yieldparam iso_to [String] Currency ISO string.
+      # @yieldparam rate [Numeric] Exchange rate.
+      #
+      # @return [Enumerator]
+      #
+      # @example
+      #   store.each_rate do |iso_from, iso_to, rate|
+      #     puts [iso_from, iso_to, rate].join
+      #   end
+      def each_rate(&block)
+        enum = Enumerator.new do |yielder|
+          rates.each do |key, rate|
+            iso_from, iso_to = key.split('_to_')
+            yielder.yield iso_from.upcase, iso_to.upcase, rate
+          end
+        end
+
+        block_given? ? enum.each(&block) : enum
       end
     end
   end
